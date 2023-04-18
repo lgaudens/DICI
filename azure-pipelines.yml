@@ -1,0 +1,76 @@
+# Talend CI/CD on Azure DevOps
+# Build Pipeline for building and publishing on Nexus
+
+trigger: none
+pool:
+ vmImage: 'ubuntu-latest'
+
+variables:
+- group: Talend Variables
+- name: project_name
+  value: 'DICI'
+- name: builder_version
+  value: '8.0.12'
+- name: jobs_to_build
+  value: 'process/*_0.1'
+
+- name: talend_ci_config
+  value: >-
+    -DforceUpdate=true
+    -Dlicense.path=$(license.secureFilePath)
+    -Dtalend.studio.p2.base=$(p2_base_url)
+    -Dtalend.studio.p2.update=$(p2_update_url)
+    -Pcloud-publisher
+    -Dservice.url=$(talend_cloud_url)
+    -Dcloud.token=$(talend_cloud_token)
+    -Dcloud.publisher.screenshot=true
+    -Dcloud.publisher.environment=dev-ci 
+    -Dcloud.publisher.workspace=ci-ws
+
+steps:
+  - task: DownloadSecureFile@1
+    name: settings_xml
+    inputs:
+      secureFile: azure_settings.xml
+
+  - task: DownloadSecureFile@1
+    name: license
+    inputs:
+      secureFile: license
+
+  - task: DownloadSecureFile@1
+    name: pom_xml
+    inputs:
+      secureFile: sample_pom.xml
+
+#  - task: Maven@3
+#    displayName: 'Maven install builder plugin'
+#    inputs:
+#      mavenPomFile: 'builder-maven-plugin-8.0.12.pom'
+#      goals: 'install:install-file' 
+#      options: '--batch-mode --settings $(settings_xml.secureFilePath) '
+#      mavenOptions: |
+#        -Dfile=./builder/8.0.1/builder-maven-plugin-8.0.1.jar
+#        -DpomFile=./builder/8.0.1/builder-maven-plugin-8.0.1.pom
+
+  - task: Maven@3
+    displayName: 'Maven install P2 and generate POMs'
+    inputs:
+      mavenPomFile: '$(pom_xml.secureFilePath)'
+      goals: 'org.talend.ci:builder-maven-plugin:$(builder_version):generateAllPoms' 
+      options: '--batch-mode --settings $(settings_xml.secureFilePath) $(talend_ci_config)'
+      publishJUnitResults: false
+
+  - task: CmdLine@2
+    displayName: 'List modules / available artifacts to build'
+    inputs:
+      script: |
+        pwd
+        cat $(project_name)/poms/pom.xml | sed '/<modules>/,/<\/modules>/!d'
+
+  - task: Maven@3
+    displayName: 'Maven build & publish Talend artifacts to Talend Cloud'
+    inputs:
+        mavenPomFile: '$(project_name)/poms/pom.xml'
+        goals: 'deploy' #compile / deploy
+        options: '--batch-mode --settings $(settings_xml.secureFilePath) -am -fae $(talend_ci_config)'

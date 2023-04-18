@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:TalendProperties="http://www.talend.org/properties">
+  <TalendProperties:Project xmi:id="_uN_Lcd3vEe23nZyUiori_w" label="DICI" description="" language="java" technicalLabel="DICI" author="_uN_Lct3vEe23nZyUiori_w" productVersion="Talend Cloud Data Fabric-8.0.1.20220923_1236-patch" url="{&quot;commitLogPattern&quot;:&quot;{0}&quot;,&quot;location&quot;:&quot;git@github.com:lgaudens/DICI.git&quot;,&quot;settings&quot;:&quot;000&quot;,&quot;storage&quot;:&quot;git&quot;}" type="DQ" itemsRelationVersion="1.3" bigData="false">
+    <migrationTask xmi:id="_uO5xcN3vEe23nZyUiori_w" id="org.talend.repository.model.migration.CheckProductVersionMigrationTask" breaks="7.1.0" version="7.1.1"/>
+  </TalendProperties:Project>
+  <TalendProperties:User xmi:id="_uN_Lct3vEe23nZyUiori_w" login="lgaudens.talend.com@rd.aws.eu.talend.com" firstName="Laureline" lastName="Gaudens" type="DQ"/>
+</xmi:XMI>
